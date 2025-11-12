@@ -1,2 +1,5 @@
 # Splitter-2-Way-50Ohm
-Simulation and Testing of a 50ohm 2 way splitter
+
+This is a github repository to make a 50-ohm RF-splitter.  
+It currently uses Kicad 9.0.
+

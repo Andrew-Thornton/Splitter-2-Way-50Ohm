@@ -1,0 +1,7 @@
+ # Ignore everything in this folder
+./*
+
+# besides
+!./*.kicad_pcb
+!./*.kicad_pro
+!./*.kicad_sch

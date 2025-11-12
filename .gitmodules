@@ -1,0 +1,4 @@
+[submodule "sub/openEMS-Project"]
+	path = sub/openEMS-Project
+	url = https://github.com/thliebig/openEMS-Project.git
+	ignore = all

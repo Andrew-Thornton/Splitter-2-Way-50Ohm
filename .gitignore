@@ -1,0 +1,5 @@
+venv/
+*.FCBak
+*.kicad_prl
+*.lck
+*-backups/

@@ -128,56 +128,44 @@ print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
 trace.AddBox(start, stop, priority=999)
 
-# ### CPW ground planes (left and right of the gap)
-# gnd = CSX.AddMetal('GND')
-# start = [-CPW_length/2, -CPW_width/2 - CPW_gap, substrate_thickness]
-# stop  = [ CPW_length/2, -substrate_width/2,      substrate_thickness]
-# gnd.AddBox(start, stop, priority=999)
+### CPW ground planes (left and right of the gap)
+gnd = CSX.AddMetal('GND')
+start = [          0, PCB_WIDTH/2 + trace_width/2 + CPW_gap, air_spacing+PCB_THICKNESS]
+stop  = [ PCB_LENGTH,                             PCB_WIDTH, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
-# start = [-CPW_length/2,  CPW_width/2 + CPW_gap, substrate_thickness]
-# stop  = [ CPW_length/2,  substrate_width/2,      substrate_thickness]
-# gnd.AddBox(start, stop, priority=999)
+start = [          0,                                      0, air_spacing+PCB_THICKNESS]
+stop  = [ PCB_LENGTH,  PCB_WIDTH/2 - trace_width/2 - CPW_gap, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
-# bottom_and_vias = CSX.AddMetal('BOTTOM_AND_VIAS')
-# start = [-CPW_length/2, -substrate_width/2, 0]
-# stop = [ CPW_length/2, substrate_width/2, 0]
-# # gnd.AddBox(start, stop, priority=999)
+bottom_and_vias = CSX.AddMetal('BOTTOM_AND_VIAS')
+start = [         0,         0, air_spacing]
+stop  = [PCB_LENGTH, PCB_WIDTH, air_spacing]
+gnd.AddBox(start, stop, priority=999)
 # bottom_and_vias.AddBox(start, stop, priority=999)
 
-# via_radias = 500 #um
-# via_spacing = 2200 #um
-# distance_from_centre = 840 #um
+via_radias = 500 #um
+via_spacing = 2200 #um
+distance_from_centre = 840 #um
 
-# half_num_vias_wide = floor(((CPW_length/2)+2*via_radias) / via_spacing)
-# print(f"half_num_vias_wide is {half_num_vias_wide}")
-# print(f"num_vias_wide is {2*half_num_vias_wide}")
+num_vias_wide = floor((PCB_LENGTH) / via_spacing)
+print(f"num_vias_wide is {num_vias_wide}")
 
-# half_num_vias_tall = floor(((substrate_width/2)+2*via_radias - distance_from_centre) / via_spacing)
-# print(f"half_num_vias_tall is {2*half_num_vias_tall}")
-# print(f"num_vias_tall is {2*half_num_vias_tall}")
+half_num_vias_tall = floor((PCB_WIDTH/2) / via_spacing)
+print(f"half_num_vias_tall is {half_num_vias_tall}")
 
-# print(f"num_vias_wide is {half_num_vias_wide}")
-# for wide_via_idx in range(half_num_vias_wide):
-#     for tall_via_idx in range(half_num_vias_tall):
-#         start = [wide_via_idx*via_spacing + via_radias/2, tall_via_idx*via_spacing + distance_from_centre + via_radias/2, substrate_thickness]
-#         stop  = [wide_via_idx*via_spacing -via_radias/2, tall_via_idx*via_spacing + distance_from_centre - via_radias/2, 0]
-#         gnd.AddBox(start, stop, priority=999)
-#         # bottom_and_vias.AddBox(start, stop, priority=999)
+for wide_via_idx in range(num_vias_wide):
+    for tall_via_idx in range(half_num_vias_tall):
+        start = [via_spacing/2 + wide_via_idx*via_spacing + via_radias/2, PCB_WIDTH/2 + tall_via_idx*via_spacing + distance_from_centre + via_radias/2, air_spacing+PCB_THICKNESS]
+        stop  = [via_spacing/2 + wide_via_idx*via_spacing - via_radias/2, PCB_WIDTH/2 + tall_via_idx*via_spacing + distance_from_centre - via_radias/2, air_spacing]
+        gnd.AddBox(start, stop, priority=999)
+        # bottom_and_vias.AddBox(start, stop, priority=999)
 
-#         start = [-wide_via_idx*via_spacing + via_radias/2, tall_via_idx*via_spacing + distance_from_centre + via_radias/2, substrate_thickness]
-#         stop  = [-wide_via_idx*via_spacing -via_radias/2, tall_via_idx*via_spacing + distance_from_centre - via_radias/2, 0]
-#         gnd.AddBox(start, stop, priority=999)
-#         # bottom_and_vias.AddBox(start, stop, priority=999)
+        start = [via_spacing/2 + wide_via_idx*via_spacing + via_radias/2, PCB_WIDTH/2 - tall_via_idx*via_spacing - distance_from_centre + via_radias/2, air_spacing+PCB_THICKNESS]
+        stop  = [via_spacing/2 + wide_via_idx*via_spacing - via_radias/2, PCB_WIDTH/2 - tall_via_idx*via_spacing - distance_from_centre - via_radias/2, air_spacing]
+        gnd.AddBox(start, stop, priority=999)
+        # bottom_and_vias.AddBox(start, stop, priority=999)
 
-#         start = [wide_via_idx*via_spacing + via_radias/2, -tall_via_idx*via_spacing - distance_from_centre + via_radias/2, substrate_thickness]
-#         stop  = [wide_via_idx*via_spacing - via_radias/2, -tall_via_idx*via_spacing - distance_from_centre - via_radias/2, 0]
-#         gnd.AddBox(start, stop, priority=999)
-#         # bottom_and_vias.AddBox(start, stop, priority=999)
-
-#         start = [-wide_via_idx*via_spacing + via_radias/2, -tall_via_idx*via_spacing -distance_from_centre + via_radias/2, substrate_thickness]
-#         stop  = [-wide_via_idx*via_spacing - via_radias/2, -tall_via_idx*via_spacing -distance_from_centre - via_radias/2, 0]
-#         gnd.AddBox(start, stop, priority=999)
-#         # bottom_and_vias.AddBox(start, stop, priority=999)
 
 
 

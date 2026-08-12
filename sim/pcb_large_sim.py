@@ -74,7 +74,8 @@ print(f"resolution is {resolution}")
 # x-mesh: cuts up the length axis into resolution even points
 mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
-mesh.SmoothMeshLines('x', resolution)
+x_resolution = 100
+mesh.SmoothMeshLines('x', x_resolution)
 
 # y-mesh: fine at CPW signal and gap edges, coarse elsewhere
 #car between SMAs or Y=6 to 34
@@ -93,9 +94,61 @@ mesh.SmoothMeshLines('y', resolution)
 # mesh.SmoothMeshLines('y', resolution, ratio=1.3)
 
 # z-mesh: fine inside substrate, coarse in air
-mesh.AddLine('z', [0])
-mesh.AddLine('z', [2*air_spacing])
-mesh.SmoothMeshLines('z', resolution)
+# mesh.AddLine('z', [0])
+# mesh.AddLine('z', [2*air_spacing])
+# mesh.SmoothMeshLines('z', resolution)
+
+# Z mesh
+# Z mesh
+z_bottom = 0
+z_substrate_start = air_spacing - PCB_THICKNESS
+z_substrate_end = air_spacing + 2* PCB_THICKNESS
+z_top = 2*air_spacing + PCB_THICKNESS
+
+# Bottom air
+z_lines_bottom = np.arange(
+    z_bottom,
+    z_substrate_start,
+    1000
+)
+
+# Substrate
+z_lines_substrate = np.arange(
+    z_substrate_start,
+    z_substrate_end,
+    20
+)
+
+# Top air
+z_lines_top = np.arange(
+    z_substrate_end,
+    z_top,
+    1000
+)
+
+# Make sure important boundaries are included
+z_lines = np.unique(np.concatenate([
+    z_lines_bottom,
+    [z_substrate_start],
+    z_lines_substrate,
+    [z_substrate_end],
+    z_lines_top,
+    [z_top]
+]))
+
+mesh.AddLine('z', z_lines)
+
+
+
+x_cells = len(mesh.GetLines('x')) - 1
+y_cells = len(mesh.GetLines('y')) - 1
+z_cells = len(mesh.GetLines('z')) - 1
+
+total_cells = x_cells * y_cells * z_cells
+print(f"X cells: {x_cells:,}")
+print(f"Y cells: {y_cells:,}")
+print(f"Z cells: {z_cells:,}")
+print(f"Total cells: {total_cells:,}")
 
 ### Substrate
 substrate = CSX.AddMaterial('RO4350B', epsilon=substrate_epr, kappa=kappa_estimate)

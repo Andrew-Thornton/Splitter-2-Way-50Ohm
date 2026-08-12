@@ -42,9 +42,9 @@ PCB_THICKNESS = 510
 
 CPW_length          = 40000
 CPW_port_length     = 10000
-CPW_width           = 620
+trace_width         = 620
 CPW_gap             = 200
-substrate_thickness = 510 # 512 um chaging to 
+# substrate_thickness = 510 # 512 um chaging to 
 substrate_width     = 10000
 substrate_epr       = 3.48
 f_max               = 10e9
@@ -100,27 +100,33 @@ start = [0, 0, air_spacing]
 stop  = [ PCB_LENGTH,  PCB_WIDTH, air_spacing+PCB_THICKNESS]
 substrate.AddBox(start, stop)
 
-# ### CPW ports (include the port metal)
-# cpw_port_metal = CSX.AddMetal('CPW_PORT')
+### CPW ports (include the port metal)
+cpw_port_metal = CSX.AddMetal('CPW_PORT')
+CPW_port_length = 2000 # 2mm
+portstart = [               0, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+portstop  = [CPW_port_length,  PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'port1_start = {portstart}')
+print(f'port1_stop  = {portstop}')
+port1 = CPWPort(CSX, 1, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
+                excite=1, priority=999,
+                MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
 
-# portstart = [-CPW_length/2,                  -CPW_width/2, substrate_thickness]
-# portstop  = [-CPW_length/2 + CPW_port_length,  CPW_width/2, substrate_thickness]
-# port1 = CPWPort(CSX, 1, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
-#                 excite=1, priority=999,
-#                 MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
+portstart = [ PCB_LENGTH                  , PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+portstop  = [ PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'port1_start = {portstart}')
+print(f'port1_stop  = {portstop}')
+port2 = CPWPort(CSX, 2, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
+                priority=999, MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
 
-# portstart = [ CPW_length/2,                  -CPW_width/2, substrate_thickness]
-# portstop  = [ CPW_length/2 - CPW_port_length,  CPW_width/2, substrate_thickness]
-# port2 = CPWPort(CSX, 2, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
-#                 priority=999, MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
+ports = [port1, port2]
 
-# ports = [port1, port2]
-
-# ### CPW centre conductor between the two ports
-# cpw = CSX.AddMetal('CPW')
-# start = [-CPW_length/2 + CPW_port_length, -CPW_width/2, substrate_thickness]
-# stop  = [ CPW_length/2 - CPW_port_length,  CPW_width/2, substrate_thickness]
-# cpw.AddBox(start, stop, priority=999)
+### CPW centre conductor between the two ports
+trace = CSX.AddMetal('TRACE')
+start = [             CPW_port_length, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+stop  = [PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'trace_start = {start}')
+print(f'trace_stop  = {stop}')
+trace.AddBox(start, stop, priority=999)
 
 # ### CPW ground planes (left and right of the gap)
 # gnd = CSX.AddMetal('GND')

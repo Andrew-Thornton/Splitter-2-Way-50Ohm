@@ -66,7 +66,8 @@ mesh = CSX.GetGrid()
 mesh.SetDeltaUnit(unit)
 
 print(f'C0 is {C0}')
-resolution = C0 / (f_max * np.sqrt(substrate_epr)) / unit / 30
+# resolution = C0 / (f_max * np.sqrt(substrate_epr)) / unit / 30
+resolution = 20 # 20um cell size
 edge_res   = 40
 
 print(f"resolution is {resolution}")
@@ -78,10 +79,12 @@ mesh.SmoothMeshLines('x', resolution)
 # y-mesh: fine at CPW signal and gap edges, coarse elsewhere
 #car between SMAs or Y=6 to 34
 #care less between 0<Y<6 and 34<Y<40
-third_mesh = np.array([-2/3, 1/3]) * edge_res
+# third_mesh = np.array([-2/3, 1/3]) * edge_res
 mesh.AddLine('y', [0])
 mesh.AddLine('y', [PCB_WIDTH])
-# mesh.SmoothMeshLines('y', resolution)
+print(f'resolution = {resolution}')
+mesh.SmoothMeshLines('y', resolution)
+
 # y_pos = mesh.GetLines('y')
 # mesh.AddLine('y', np.concatenate([-y_pos,
 #                                    [-substrate_width/2,  substrate_width/2],
@@ -180,6 +183,7 @@ xmlpath = simdir / xmlname
 
 CSX.Write2XML(str(xmlpath))
 os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
+
 
 ### Run the simulation
 FDTD.Run(Sim_Path, cleanup=True)

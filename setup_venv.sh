@@ -60,6 +60,15 @@ function setup_venv {
     python3.12 -m venv "$VENV_DIR" || die
   fi
   source "$VENV_DIR/bin/activate"
+
+  local requirements_file="$(pwd)/requirements.txt"
+  if [ -f "$requirements_file" ]; then
+    echo "installing python requirements from $requirements_file ... please wait"
+    pip install --upgrade pip 2>&1 | tee -a "$LOG_FILE" >> "$STDOUT" || die
+    pip install -r "$requirements_file" 2>&1 | tee -a "$LOG_FILE" >> "$STDOUT" || die
+  else
+    echo "no requirements.txt found at $requirements_file, skipping"
+  fi
 }
 
 # defaults

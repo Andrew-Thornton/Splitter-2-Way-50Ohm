@@ -252,20 +252,41 @@ resistor = CSX.AddLumpedElement(
 )
 res_height = 550
 resistor.AddBox(
-    [res_left_x + res_pad_width/2,
+    [res_left_x,
      res_y - res_pad_height/2,
      res_z],
-    [res_right_x - res_pad_width/2,
+    [res_right_x,
      res_y + res_pad_height/2,
      res_z+res_height],
     priority=1000
 )
 
-### CPW ground planes (left and right of the gap)
+### CPW ground planes
 gnd = CSX.AddMetal('GND')
-# start = [          0, PCB_WIDTH/2 + trace_width/2 + CPW_gap, air_spacing+PCB_THICKNESS]
-# stop  = [ PCB_LENGTH,                             PCB_WIDTH, air_spacing+PCB_THICKNESS]
-# gnd.AddBox(start, stop, priority=999)
+start = [          0, 19.49*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 19.28*1000,          0, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [          0, 20.51*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 19.28*1000,    40*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 26.83*1000, 19.49*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 75*1000,          0, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 26.83*999, 20.51*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 75*1000,    40*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+
+start = [ 19.28*1000, 18.12*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 26.83*1000,          0, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 19.28*1000, 21.88*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 26.83*1000,    40*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
 # start = [          0,                                      0, air_spacing+PCB_THICKNESS]
 # stop  = [ PCB_LENGTH,  PCB_WIDTH/2 - trace_width/2 - CPW_gap, air_spacing+PCB_THICKNESS]

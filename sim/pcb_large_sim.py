@@ -75,6 +75,21 @@ print(f"resolution is {resolution}")
 mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
 mesh.AddLine('x', [-air_spacing, PCB_LENGTH + air_spacing])
+
+# 2512 resistor pad boundaries
+res_pad_width  = 1225   # um
+res_pad_height = 3350   # um
+res_left_x     = 20037.5
+res_right_x    = 25962.5
+res_y          = 20000
+
+mesh.AddLine('x', [
+    res_left_x  - res_pad_width/2,
+    res_left_x  + res_pad_width/2,
+    res_right_x - res_pad_width/2,
+    res_right_x + res_pad_width/2
+])
+
 x_resolution = 100
 mesh.SmoothMeshLines('x', x_resolution)
 
@@ -88,6 +103,12 @@ mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + CPW_gap - third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - CPW_gap + third_mesh)
+
+mesh.AddLine('y', [
+    res_y - res_pad_height/2,
+    res_y + res_pad_height/2
+])
+
 mesh.SmoothMeshLines('y', edge_res*1.5, ratio=1.5)
 print(f'resolution = {resolution}')
 resolution = C0 / (f_max * np.sqrt(substrate_epr)) / unit / 30
@@ -183,6 +204,50 @@ stop  = [PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 - trace_width/2, air_spacing+
 print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
 trace.AddBox(start, stop, priority=999)
+
+### 2512 resistor
+resistor_R = 16.0  # Ohms
+res_z = air_spacing + PCB_THICKNESS
+
+res_pads = CSX.AddMetal('RESISTOR_PADS')
+
+# Left pad
+res_pads.AddBox(
+    [res_left_x - res_pad_width/2,
+     res_y - res_pad_height/2,
+     res_z],
+    [res_left_x + res_pad_width/2,
+     res_y + res_pad_height/2,
+     res_z],
+    priority=999
+)
+
+# Right pad
+res_pads.AddBox(
+    [res_right_x - res_pad_width/2,
+     res_y - res_pad_height/2,
+     res_z],
+    [res_right_x + res_pad_width/2,
+     res_y + res_pad_height/2,
+     res_z],
+    priority=999
+)
+
+# 16-ohm lumped element across the gap
+resistor = CSX.AddLumpedElement(
+    'RESISTOR_16R',
+    ny=0,
+    R=resistor_R
+)
+resistor.AddBox(
+    [res_left_x + res_pad_width/2,
+     res_y - res_pad_height/2,
+     res_z],
+    [res_right_x - res_pad_width/2,
+     res_y + res_pad_height/2,
+     res_z],
+    priority=1000
+)
 
 ### CPW ground planes (left and right of the gap)
 gnd = CSX.AddMetal('GND')

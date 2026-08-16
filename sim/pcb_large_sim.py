@@ -81,18 +81,17 @@ mesh.SmoothMeshLines('x', x_resolution)
 # y-mesh: fine at CPW signal and gap edges, coarse elsewhere
 #car between SMAs or Y=6 to 34
 #care less between 0<Y<6 and 34<Y<40
-# third_mesh = np.array([-2/3, 1/3]) * edge_res
+third_mesh = np.array([-2/3, 1/3]) * edge_res
 mesh.AddLine('y', [0])
 mesh.AddLine('y', [PCB_WIDTH])
+mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + third_mesh)
+mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + CPW_gap - third_mesh)
+mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - third_mesh)
+mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - CPW_gap + third_mesh)
+mesh.SmoothMeshLines('y', edge_res*1.5, ratio=1.5)
 print(f'resolution = {resolution}')
-mesh.SmoothMeshLines('y', resolution)
-
-# y_pos = mesh.GetLines('y')
-# mesh.AddLine('y', np.concatenate([-y_pos,
-#                                    [-substrate_width/2,  substrate_width/2],
-#                                    [-substrate_width/2 - air_spacing,
-#                                      substrate_width/2 + air_spacing]]))
-# mesh.SmoothMeshLines('y', resolution, ratio=1.3)
+resolution = C0 / (f_max * np.sqrt(substrate_epr)) / unit / 30
+mesh.SmoothMeshLines('y', resolution, ratio=1.3)
 
 # z-mesh: fine inside substrate, coarse in air
 # mesh.AddLine('z', [0])
@@ -102,8 +101,8 @@ mesh.SmoothMeshLines('y', resolution)
 # Z mesh
 # Z mesh
 z_bottom = 0
-z_substrate_start = air_spacing - PCB_THICKNESS
-z_substrate_end = air_spacing + 2* PCB_THICKNESS
+z_substrate_start = air_spacing
+z_substrate_end = air_spacing + PCB_THICKNESS
 z_top = 2*air_spacing + PCB_THICKNESS
 
 # Bottom air
@@ -249,6 +248,11 @@ for port in ports:
 
 s11 = ports[0].uf_ref / ports[0].uf_inc
 s21 = ports[1].uf_ref / ports[0].uf_inc
+
+print('ports[0].uf_ref is')
+print(ports[0].uf_ref)
+print('ports[1].uf_ref is')
+print(ports[1].uf_ref)
 
 s11_dB = 20 * np.log10(np.abs(s11))
 s21_dB = 20 * np.log10(np.abs(s21))

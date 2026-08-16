@@ -1,7 +1,7 @@
 # Splitter-2-Way-50Ohm
 
 This GitHub repository provides a design for a **50-ohm RF splitter**.  
-It currently uses **KiCad 9.0** and is being tested on **Ubuntu 24.04**.
+It currently uses **KiCad 10.0** and is being tested on **Ubuntu 24.04**.
 
 
 ---
@@ -20,7 +20,7 @@ git submodule update --init --recursive
 ### 2. Kicad
 Add the KiCad PPA, update your package list, and install KiCad:
 ```bash
-sudo add-apt-repository ppa:kicad/kicad-9.0-releases  
+sudo add-apt-repository ppa:kicad/kicad-10.0-releases  
 sudo apt update  
 sudo apt install kicad  
 ```

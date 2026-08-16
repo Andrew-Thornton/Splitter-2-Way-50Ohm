@@ -32,7 +32,7 @@ epsilon_0 = 8.8541878128e-12
 print(f'epsilon_0 is {epsilon_0}')
 
 ### Setup the simulation
-Sim_Path = os.path.join(tempfile.gettempdir(), 'CPW_Line')
+Sim_Path = os.path.join(tempfile.gettempdir(), 'pcb_large_sim')
 
 unit                = 1e-6   # drawing unit in um
 
@@ -74,6 +74,7 @@ print(f"resolution is {resolution}")
 # x-mesh: cuts up the length axis into resolution even points
 mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
+mesh.AddLine('x', [-air_spacing, PCB_LENGTH + air_spacing])
 x_resolution = 100
 mesh.SmoothMeshLines('x', x_resolution)
 
@@ -159,16 +160,16 @@ substrate.AddBox(start, stop)
 ### CPW ports (include the port metal)
 cpw_port_metal = CSX.AddMetal('CPW_PORT')
 CPW_port_length = 2000 # 2mm
-portstart = [               0, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
-portstop  = [CPW_port_length,  PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+portstart = [               0, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+portstop  = [CPW_port_length,  PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
 print(f'port1_start = {portstart}')
 print(f'port1_stop  = {portstop}')
 port1 = CPWPort(CSX, 1, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
                 excite=1, priority=999,
                 MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
 
-portstart = [ PCB_LENGTH                  , PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
-portstop  = [ PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+portstart = [ PCB_LENGTH                  , PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+portstop  = [ PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
 print(f'port1_start = {portstart}')
 print(f'port1_stop  = {portstop}')
 port2 = CPWPort(CSX, 2, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
@@ -194,7 +195,7 @@ start = [          0,                                      0, air_spacing+PCB_TH
 stop  = [ PCB_LENGTH,  PCB_WIDTH/2 - trace_width/2 - CPW_gap, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
-bottom_and_vias = CSX.AddMetal('BOTTOM_AND_VIAS')
+# bottom_and_vias = CSX.AddMetal('BOTTOM_AND_VIAS')
 start = [         0,         0, air_spacing]
 stop  = [PCB_LENGTH, PCB_WIDTH, air_spacing]
 gnd.AddBox(start, stop, priority=999)

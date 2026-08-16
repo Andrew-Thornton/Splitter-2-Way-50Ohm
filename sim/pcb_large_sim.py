@@ -76,7 +76,7 @@ mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
 mesh.AddLine('x', [-air_spacing, PCB_LENGTH + air_spacing])
 
-# 2512 resistor pad boundaries
+#2512 resistor pad boundaries
 res_pad_width  = 1225   # um
 res_pad_height = 3350   # um
 res_left_x     = 20037.5
@@ -104,10 +104,10 @@ mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + CPW_gap - third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - CPW_gap + third_mesh)
 
-mesh.AddLine('y', [
-    res_y - res_pad_height/2,
-    res_y + res_pad_height/2
-])
+# mesh.AddLine('y', [
+#     res_y - res_pad_height/2,
+#     res_y + res_pad_height/2
+# ])
 
 mesh.SmoothMeshLines('y', edge_res*1.5, ratio=1.5)
 print(f'resolution = {resolution}')
@@ -198,21 +198,31 @@ port2 = CPWPort(CSX, 2, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
 ports = [port1, port2]
 
 ### CPW centre conductor between the two ports
-trace = CSX.AddMetal('TRACE')
+trace_in = CSX.AddMetal('TRACE_IN')
 start = [             CPW_port_length, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+stop  = [19.5*1000, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'trace_start = {start}')
+print(f'trace_stop  = {stop}')
+trace_in.AddBox(start, stop, priority=999)
+
+
+### CPW centre conductor between the two ports
+trace_out = CSX.AddMetal('TRACE_OUT')
+start = [                   26.6*1000, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
 stop  = [PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
 print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
-trace.AddBox(start, stop, priority=999)
+trace_out.AddBox(start, stop, priority=999)
+
 
 ### 2512 resistor
 resistor_R = 16.0  # Ohms
 res_z = air_spacing + PCB_THICKNESS
 
-res_pads = CSX.AddMetal('RESISTOR_PADS')
+res1_pad1 = CSX.AddMetal('RESISTOR1_PAD1')
 
 # Left pad
-res_pads.AddBox(
+res1_pad1.AddBox(
     [res_left_x - res_pad_width/2,
      res_y - res_pad_height/2,
      res_z],
@@ -222,8 +232,9 @@ res_pads.AddBox(
     priority=999
 )
 
+res1_pad2 = CSX.AddMetal('RESISTOR1_PAD2')
 # Right pad
-res_pads.AddBox(
+res1_pad2.AddBox(
     [res_right_x - res_pad_width/2,
      res_y - res_pad_height/2,
      res_z],
@@ -233,31 +244,32 @@ res_pads.AddBox(
     priority=999
 )
 
-# 16-ohm lumped element across the gap
+# # 16-ohm lumped element across the gap
 resistor = CSX.AddLumpedElement(
     'RESISTOR_16R',
     ny=0,
     R=resistor_R
 )
+res_height = 550
 resistor.AddBox(
     [res_left_x + res_pad_width/2,
      res_y - res_pad_height/2,
      res_z],
     [res_right_x - res_pad_width/2,
      res_y + res_pad_height/2,
-     res_z],
+     res_z+res_height],
     priority=1000
 )
 
 ### CPW ground planes (left and right of the gap)
 gnd = CSX.AddMetal('GND')
-start = [          0, PCB_WIDTH/2 + trace_width/2 + CPW_gap, air_spacing+PCB_THICKNESS]
-stop  = [ PCB_LENGTH,                             PCB_WIDTH, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
+# start = [          0, PCB_WIDTH/2 + trace_width/2 + CPW_gap, air_spacing+PCB_THICKNESS]
+# stop  = [ PCB_LENGTH,                             PCB_WIDTH, air_spacing+PCB_THICKNESS]
+# gnd.AddBox(start, stop, priority=999)
 
-start = [          0,                                      0, air_spacing+PCB_THICKNESS]
-stop  = [ PCB_LENGTH,  PCB_WIDTH/2 - trace_width/2 - CPW_gap, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
+# start = [          0,                                      0, air_spacing+PCB_THICKNESS]
+# stop  = [ PCB_LENGTH,  PCB_WIDTH/2 - trace_width/2 - CPW_gap, air_spacing+PCB_THICKNESS]
+# gnd.AddBox(start, stop, priority=999)
 
 # bottom_and_vias = CSX.AddMetal('BOTTOM_AND_VIAS')
 start = [         0,         0, air_spacing]
@@ -277,14 +289,32 @@ print(f"half_num_vias_tall is {half_num_vias_tall}")
 
 for wide_via_idx in range(num_vias_wide):
     for tall_via_idx in range(half_num_vias_tall):
-        start = [via_spacing/2 + wide_via_idx*via_spacing + via_radias/2, PCB_WIDTH/2 + tall_via_idx*via_spacing + distance_from_centre + via_radias/2, air_spacing+PCB_THICKNESS]
-        stop  = [via_spacing/2 + wide_via_idx*via_spacing - via_radias/2, PCB_WIDTH/2 + tall_via_idx*via_spacing + distance_from_centre - via_radias/2, air_spacing]
-        gnd.AddBox(start, stop, priority=999)
+        via_x_start = via_spacing/2 + wide_via_idx*via_spacing + via_radias/2
+        via_x_end   = via_spacing/2 + wide_via_idx*via_spacing - via_radias/2
+        via_x_avg   = (via_x_start + via_x_end) / 2
+        via_y_start = PCB_WIDTH/2 + tall_via_idx*via_spacing + distance_from_centre + via_radias/2
+        via_y_end   = PCB_WIDTH/2 + tall_via_idx*via_spacing + distance_from_centre - via_radias/2
+        via_y_avg   = (via_y_start + via_y_end) / 2
+        via_z_start = air_spacing+PCB_THICKNESS
+        via_z_end   = air_spacing
+        start = [via_x_start, via_y_start, via_z_start]
+        stop  = [via_x_end  , via_y_end  , via_z_end]
+        if not(((19040< via_x_avg) and (via_x_avg <26840)) and ((18000< via_y_avg) and (via_y_avg <22000))):
+            gnd.AddBox(start, stop, priority=999)
         # bottom_and_vias.AddBox(start, stop, priority=999)
 
-        start = [via_spacing/2 + wide_via_idx*via_spacing + via_radias/2, PCB_WIDTH/2 - tall_via_idx*via_spacing - distance_from_centre + via_radias/2, air_spacing+PCB_THICKNESS]
-        stop  = [via_spacing/2 + wide_via_idx*via_spacing - via_radias/2, PCB_WIDTH/2 - tall_via_idx*via_spacing - distance_from_centre - via_radias/2, air_spacing]
-        gnd.AddBox(start, stop, priority=999)
+        via_x_start  = via_spacing/2 + wide_via_idx*via_spacing + via_radias/2
+        via_x_end    = via_spacing/2 + wide_via_idx*via_spacing - via_radias/2
+        via_x_avg    = (via_x_start + via_x_end) / 2
+        via_y_start  = PCB_WIDTH/2 - tall_via_idx*via_spacing - distance_from_centre + via_radias/2
+        via_y_end    = PCB_WIDTH/2 - tall_via_idx*via_spacing - distance_from_centre - via_radias/2
+        via_y_avg    = (via_y_start + via_y_end) / 2
+        via_z_start  = air_spacing + PCB_THICKNESS
+        via_z_end    = air_spacing
+        start = [via_x_start, via_y_start, via_z_start ]
+        stop  = [via_x_end  ,   via_y_end, via_z_end ]
+        if not(((19040< via_x_avg) and (via_x_avg <26840)) and ((18000< via_y_avg) and (via_y_avg <22000))):
+            gnd.AddBox(start, stop, priority=999)
         # bottom_and_vias.AddBox(start, stop, priority=999)
 
 

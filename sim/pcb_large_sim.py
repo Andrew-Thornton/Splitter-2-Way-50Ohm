@@ -197,14 +197,21 @@ port1 = CPWPort(CSX, 1, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
                 excite=1, priority=999,
                 MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
 
-portstart = [ PCB_LENGTH                  , PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
-portstop  = [ PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
-print(f'port1_start = {portstart}')
-print(f'port1_stop  = {portstop}')
+portstart = [ PCB_LENGTH                  , 30000 - trace_width/2, air_spacing+PCB_THICKNESS]
+portstop  = [ PCB_LENGTH - CPW_port_length, 30000 + trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'port2_start = {portstart}')
+print(f'port2_stop  = {portstop}')
 port2 = CPWPort(CSX, 2, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
                 priority=999, MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
 
-ports = [port1, port2]
+portstart = [ PCB_LENGTH                  , 10000 - trace_width/2, air_spacing+PCB_THICKNESS]
+portstop  = [ PCB_LENGTH - CPW_port_length, 10000 + trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'port3_start = {portstart}')
+print(f'port3_stop  = {portstop}')
+port3 = CPWPort(CSX, 3, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
+                priority=999, MeasPlaneShift=CPW_port_length, Feed_R=feed_R)
+
+ports = [port1, port2, port3]
 
 ### CPW centre conductor between the two ports
 trace_in = CSX.AddMetal('TRACE_IN')

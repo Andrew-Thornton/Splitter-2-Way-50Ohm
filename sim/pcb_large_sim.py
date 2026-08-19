@@ -216,12 +216,24 @@ trace_in.AddBox(start, stop, priority=999)
 
 
 ### CPW centre conductor between the two ports
-trace_out = CSX.AddMetal('TRACE_OUT')
-start = [                   26.6*1000, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
-stop  = [PCB_LENGTH - CPW_port_length, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+trace_middle = CSX.AddMetal('TRACE_MIDDLE')
+start = [26.6*1000, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+stop  = [35.6*1000, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
 print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
-trace_out.AddBox(start, stop, priority=999)
+trace_middle.AddBox(start, stop, priority=999)
+
+start = [45.08*1000,  9.69*1000, air_spacing+PCB_THICKNESS]
+stop  = [47.20*1000, 10.31*1000, air_spacing+PCB_THICKNESS]
+print(f'trace_start = {start}')
+print(f'trace_stop  = {stop}')
+trace_middle.AddBox(start, stop, priority=999)
+
+start = [45.08*1000, 29.69*1000, air_spacing+PCB_THICKNESS]
+stop  = [47.20*1000, 30.31*1000, air_spacing+PCB_THICKNESS]
+print(f'trace_start = {start}')
+print(f'trace_stop  = {stop}')
+trace_middle.AddBox(start, stop, priority=999)
 
 
 ### 2512 resistor

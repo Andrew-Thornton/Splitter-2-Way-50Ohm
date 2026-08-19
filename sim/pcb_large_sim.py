@@ -76,20 +76,29 @@ mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
 mesh.AddLine('x', [-air_spacing, PCB_LENGTH + air_spacing])
 
+num_resistors = 3
 #2512 resistor pad boundaries
 res_pad_width  = 1225   # um
 res_pad_height = 3350   # um
-res_left_x     = 20037.5
-res_right_x    = 25962.5
-res_y          = 20000
+res_left_x     = [20037.5, 47037.5, 47037.5] 
+res_right_x    = [25962.5, 52962.5, 52962.5]
+res_y          = [20000.0, 10000, 30000]
 
 mesh.AddLine('x', [
-    res_left_x  - res_pad_width/2,
-    res_left_x  + res_pad_width/2,
-    res_right_x - res_pad_width/2,
-    res_right_x + res_pad_width/2
+    res_left_x[0]  - res_pad_width/2,
+    res_left_x[0]  + res_pad_width/2,
+    res_right_x[0] - res_pad_width/2,
+    res_right_x[0] + res_pad_width/2
 ])
+x_resolution = 100
+mesh.SmoothMeshLines('x', x_resolution)
 
+mesh.AddLine('x', [
+    res_left_x[1]  - res_pad_width/2,
+    res_left_x[1]  + res_pad_width/2,
+    res_right_x[1] - res_pad_width/2,
+    res_right_x[1] + res_pad_width/2
+])
 x_resolution = 100
 mesh.SmoothMeshLines('x', x_resolution)
 
@@ -219,47 +228,47 @@ trace_out.AddBox(start, stop, priority=999)
 resistor_R = 16.0  # Ohms
 res_z = air_spacing + PCB_THICKNESS
 
-res1_pad1 = CSX.AddMetal('RESISTOR1_PAD1')
+for i in range(num_resistors):
+    res_pad1 = CSX.AddMetal(f"RESISTOR{i}_PAD1")
+    # Left pad
+    res_pad1.AddBox(
+        [res_left_x[i] - res_pad_width/2,
+        res_y[i] - res_pad_height/2,
+        res_z],
+        [res_left_x[i] + res_pad_width/2,
+        res_y[i] + res_pad_height/2,
+        res_z],
+        priority=999
+    )
 
-# Left pad
-res1_pad1.AddBox(
-    [res_left_x - res_pad_width/2,
-     res_y - res_pad_height/2,
-     res_z],
-    [res_left_x + res_pad_width/2,
-     res_y + res_pad_height/2,
-     res_z],
-    priority=999
-)
+    res_pad2 = CSX.AddMetal(f"RESISTOR{i}_PAD2")
+    # Right pad
+    res_pad2.AddBox(
+        [res_right_x[i] - res_pad_width/2,
+        res_y[i] - res_pad_height/2,
+        res_z],
+        [res_right_x[i] + res_pad_width/2,
+        res_y[i] + res_pad_height/2,
+        res_z],
+        priority=999
+    )
 
-res1_pad2 = CSX.AddMetal('RESISTOR1_PAD2')
-# Right pad
-res1_pad2.AddBox(
-    [res_right_x - res_pad_width/2,
-     res_y - res_pad_height/2,
-     res_z],
-    [res_right_x + res_pad_width/2,
-     res_y + res_pad_height/2,
-     res_z],
-    priority=999
-)
-
-# # 16-ohm lumped element across the gap
-resistor = CSX.AddLumpedElement(
-    'RESISTOR_16R',
-    ny=0,
-    R=resistor_R
-)
-res_height = 550
-resistor.AddBox(
-    [res_left_x,
-     res_y - res_pad_height/2,
-     res_z],
-    [res_right_x,
-     res_y + res_pad_height/2,
-     res_z+res_height],
-    priority=1000
-)
+    # # 16-ohm lumped element across the gap
+    resistor = CSX.AddLumpedElement(
+        f"RESISTOR_{i}_16R",
+        ny=0,
+        R=resistor_R
+    )
+    res_height = 550
+    resistor.AddBox(
+        [res_left_x[i],
+        res_y[i] - res_pad_height/2,
+        res_z],
+        [res_right_x[i],
+        res_y[i] + res_pad_height/2,
+        res_z+res_height],
+        priority=1000
+    )
 
 ### CPW ground planes
 gnd = CSX.AddMetal('GND')
@@ -271,14 +280,13 @@ start = [          0, 20.51*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 19.28*1000,    40*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
-start = [ 26.83*1000, 19.49*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 75*1000,          0, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
+# start = [ 26.83*1000, 19.49*1000, air_spacing+PCB_THICKNESS]
+# stop  = [ 75*1000,          0, air_spacing+PCB_THICKNESS]
+# gnd.AddBox(start, stop, priority=999)
 
-start = [ 26.83*999, 20.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 75*1000,    40*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
+# start = [ 26.83*999, 20.51*1000, air_spacing+PCB_THICKNESS]
+# stop  = [ 75*1000,    40*1000, air_spacing+PCB_THICKNESS]
+# gnd.AddBox(start, stop, priority=999)
 
 start = [ 19.28*1000, 18.12*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 26.83*1000,          0, air_spacing+PCB_THICKNESS]
@@ -353,51 +361,53 @@ xmlpath = simdir / xmlname
 CSX.Write2XML(str(xmlpath))
 os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
 
+run_sim = 0
 
-### Run the simulation
-FDTD.Run(Sim_Path, cleanup=True)
+if run_sim == 1:
+    ### Run the simulation
+    FDTD.Run(Sim_Path, cleanup=True)
 
-### Post-processing
-f = np.linspace(1e6, f_max, 1601)
-for port in ports:
-    port.CalcPort(Sim_Path, f, ref_impedance=50)
+    ### Post-processing
+    f = np.linspace(1e6, f_max, 1601)
+    for port in ports:
+        port.CalcPort(Sim_Path, f, ref_impedance=50)
 
-s11 = ports[0].uf_ref / ports[0].uf_inc
-s21 = ports[1].uf_ref / ports[0].uf_inc
+    s11 = ports[0].uf_ref / ports[0].uf_inc
+    s21 = ports[1].uf_ref / ports[0].uf_inc
 
-print('ports[0].uf_ref is')
-print(ports[0].uf_ref)
-print('ports[1].uf_ref is')
-print(ports[1].uf_ref)
+    print('ports[0].uf_ref is')
+    print(ports[0].uf_ref)
+    print('ports[1].uf_ref is')
+    print(ports[1].uf_ref)
 
-s11_dB = 20 * np.log10(np.abs(s11))
-s21_dB = 20 * np.log10(np.abs(s21))
+    s11_dB = 20 * np.log10(np.abs(s11))
+    s21_dB = 20 * np.log10(np.abs(s21))
 
-### Pass / fail checks
-mask = f > 100e6
-print(f'max(dB(S11)) = {np.max(s11_dB[mask]):.1f} dB')
-print(f'min(dB(S21)) = {np.min(s21_dB[mask]):.1f} dB,  max(dB(S21)) = {np.max(s21_dB[mask]):.2f} dB')
+    ### Pass / fail checks
+    mask = f > 100e6
+    print(f'max(dB(S11)) = {np.max(s11_dB[mask]):.1f} dB')
+    print(f'min(dB(S21)) = {np.min(s21_dB[mask]):.1f} dB,  max(dB(S21)) = {np.max(s21_dB[mask]):.2f} dB')
 
-# assert np.max(s11_dB[mask]) < -20, \
-#     f'FAIL: max(dB(S11)) = {np.max(s11_dB[mask]):.1f} dB, expected < -20 dB'
-# assert np.min(s21_dB[mask]) > -0.5, \
-#     f'FAIL: min(dB(S21)) = {np.min(s21_dB[mask]):.1f} dB, expected > -0.5 dB'
-# assert np.max(s21_dB[mask]) < 0.01, \
-#     f'FAIL: max(dB(S21)) = {np.max(s21_dB[mask]):.2f} dB, expected < +0.01 dB (sign error?)'
+    # assert np.max(s11_dB[mask]) < -20, \
+    #     f'FAIL: max(dB(S11)) = {np.max(s11_dB[mask]):.1f} dB, expected < -20 dB'
+    # assert np.min(s21_dB[mask]) > -0.5, \
+    #     f'FAIL: min(dB(S21)) = {np.min(s21_dB[mask]):.1f} dB, expected > -0.5 dB'
+    # assert np.max(s21_dB[mask]) < 0.01, \
+    #     f'FAIL: max(dB(S21)) = {np.max(s21_dB[mask]):.2f} dB, expected < +0.01 dB (sign error?)'
 
-print('PASS')
+    print('PASS')
 
-if 1:  # set to 1 for debugging plots
-    import matplotlib.pyplot as plt
+    if 1:  # set to 1 for debugging plots
+        import matplotlib.pyplot as plt
 
-    fig, axis = plt.subplots(num='S-Parameters', tight_layout=True)
-    axis.plot(f/1e9, s11_dB, 'k-',  linewidth=2, label='$S_{11}$')
-    axis.plot(f/1e9, s21_dB, 'r--', linewidth=2, label='$S_{21}$')
-    axis.grid()
-    axis.set_xmargin(0)
-    axis.set_xlabel('Frequency (GHz)')
-    axis.set_ylabel('S-Parameter (dB)')
-    axis.legend()
+        fig, axis = plt.subplots(num='S-Parameters', tight_layout=True)
+        axis.plot(f/1e9, s11_dB, 'k-',  linewidth=2, label='$S_{11}$')
+        axis.plot(f/1e9, s21_dB, 'r--', linewidth=2, label='$S_{21}$')
+        axis.grid()
+        axis.set_xmargin(0)
+        axis.set_xlabel('Frequency (GHz)')
+        axis.set_ylabel('S-Parameter (dB)')
+        axis.legend()
 
-    plt.show()
+        plt.show()
 

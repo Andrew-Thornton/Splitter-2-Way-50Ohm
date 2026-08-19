@@ -242,6 +242,20 @@ print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
 trace_middle.AddBox(start, stop, priority=999)
 
+trace_out2 = CSX.AddMetal('TRACE_OUT2')
+start = [PCB_LENGTH-CPW_port_length, 30000 - trace_width/2, air_spacing+PCB_THICKNESS]
+stop  = [                     53000, 30000 + trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'trace_start = {start}')
+print(f'trace_stop  = {stop}')
+trace_out2.AddBox(start, stop, priority=999)
+
+trace_out3 = CSX.AddMetal('TRACE_OUT3')
+start = [PCB_LENGTH-CPW_port_length, 10000 - trace_width/2, air_spacing+PCB_THICKNESS]
+stop  = [                     53000, 10000 + trace_width/2, air_spacing+PCB_THICKNESS]
+print(f'trace_start = {start}')
+print(f'trace_stop  = {stop}')
+trace_out2.AddBox(start, stop, priority=999)
+
 
 ### 2512 resistor
 resistor_R = 16.0  # Ohms

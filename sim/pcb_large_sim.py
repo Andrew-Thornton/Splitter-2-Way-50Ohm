@@ -381,6 +381,10 @@ start = [ 46.21*1000, 00.00*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 53.78*1000, 08.12*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
+start = [ 46.21*1000, 11.88*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 53.78*1000, 28.13*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
 # Bottom ground
 start = [         0,         0, air_spacing]
 stop  = [PCB_LENGTH, PCB_WIDTH, air_spacing]

@@ -1,0 +1,37 @@
+name: Run Sim
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Setup Virtual Environment
+        run: ./setup_venv.sh
+
+      - name: Source Virtual Environment
+        run: source ./venv/bin/activate
+
+      # - name: Set up Python
+      #   uses: actions/setup-python@v6
+      #   with:
+      #     python-version: '3.12.3'
+      #
+      # - name: Install Python dependencies
+      #   run: pip install -r requirements.txt
+      #
+      # - name: Run float_add tests
+      #   working-directory: tb/float_add_tb
+      #   run: make
+      #
+      # - name: Run float_mult tests
+      #   working-directory: tb/float_mult_tb
+      #   run: make

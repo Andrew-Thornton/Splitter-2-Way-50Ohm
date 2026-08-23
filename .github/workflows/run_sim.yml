@@ -14,6 +14,29 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            libhdf5-dev \
+            libboost-all-dev \
+            libcgal-dev \
+            libtinyxml-dev \
+            qtbase5-dev \
+            libvtk9-dev \
+            libvtk9-qt-dev \
+            gengetopt \
+            help2man \
+            groff \
+            pod2pdf \
+            bison \
+            flex \
+            libhpdf-dev \
+            libtool
+
       - name: Setup Virtual Environment
         run: ./setup_venv.sh
 

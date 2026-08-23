@@ -20,6 +20,10 @@ jobs:
       - name: Source Virtual Environment
         run: source ./venv/bin/activate
 
+      - name: Show build log
+        if: always()
+        run: cat sub/openEMS-Project/build_*.log
+
       # - name: Set up Python
       #   uses: actions/setup-python@v6
       #   with:

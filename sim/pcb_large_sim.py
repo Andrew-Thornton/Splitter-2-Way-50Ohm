@@ -254,6 +254,18 @@ trace_middle.AddPolygon(
     priority=999
 )
 
+points = [
+    [35.60*1000, 35.16*1000,  45.08*1000, 45.51*1000],
+    [20.31*1000, 19.88*1000,  9.69*1000, 10.12*1000],
+]
+
+trace_middle.AddPolygon(
+    points=points,
+    norm_dir='z',
+    elevation=air_spacing+PCB_THICKNESS,
+    priority=999
+)
+
 
 trace_out2 = CSX.AddMetal('TRACE_OUT2')
 start = [PCB_LENGTH-CPW_port_length, 30000 - trace_width/2, air_spacing+PCB_THICKNESS]

@@ -293,7 +293,7 @@ start = [PCB_LENGTH-CPW_port_length, 10000 - trace_width/2, air_spacing+PCB_THIC
 stop  = [                     53000, 10000 + trace_width/2, air_spacing+PCB_THICKNESS]
 print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
-trace_out2.AddBox(start, stop, priority=999)
+trace_out3.AddBox(start, stop, priority=999)
 
 
 ### 2512 resistor
@@ -1092,7 +1092,7 @@ xmlpath = simdir / xmlname
 CSX.Write2XML(str(xmlpath))
 os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
 
-run_sim = 0
+run_sim = 1
 
 if run_sim == 1:
     ### Run the simulation

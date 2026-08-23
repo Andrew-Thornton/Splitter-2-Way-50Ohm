@@ -1096,11 +1096,14 @@ if run_sim == 1:
 
     s11 = ports[0].uf_ref / ports[0].uf_inc
     s21 = ports[1].uf_ref / ports[0].uf_inc
+    s31 = ports[2].uf_ref / ports[0].uf_inc
 
     print('ports[0].uf_ref is')
     print(ports[0].uf_ref)
     print('ports[1].uf_ref is')
     print(ports[1].uf_ref)
+    print('ports[2].uf_ref is')
+    print(ports[2].uf_ref)
 
     s11_dB = 20 * np.log10(np.abs(s11))
     s21_dB = 20 * np.log10(np.abs(s21))
@@ -1109,6 +1112,7 @@ if run_sim == 1:
     mask = f > 100e6
     print(f'max(dB(S11)) = {np.max(s11_dB[mask]):.1f} dB')
     print(f'min(dB(S21)) = {np.min(s21_dB[mask]):.1f} dB,  max(dB(S21)) = {np.max(s21_dB[mask]):.2f} dB')
+    print(f'min(dB(S21)) = {np.min(s31_dB[mask]):.1f} dB,  max(dB(S31)) = {np.max(s31_dB[mask]):.2f} dB')
 
     # assert np.max(s11_dB[mask]) < -20, \
     #     f'FAIL: max(dB(S11)) = {np.max(s11_dB[mask]):.1f} dB, expected < -20 dB'
@@ -1117,19 +1121,31 @@ if run_sim == 1:
     # assert np.max(s21_dB[mask]) < 0.01, \
     #     f'FAIL: max(dB(S21)) = {np.max(s21_dB[mask]):.2f} dB, expected < +0.01 dB (sign error?)'
 
-    print('PASS')
+    # print('PASS')
 
     if 1:  # set to 1 for debugging plots
         import matplotlib.pyplot as plt
 
-        fig, axis = plt.subplots(num='S-Parameters', tight_layout=True)
-        axis.plot(f/1e9, s11_dB, 'k-',  linewidth=2, label='$S_{11}$')
-        axis.plot(f/1e9, s21_dB, 'r--', linewidth=2, label='$S_{21}$')
-        axis.grid()
-        axis.set_xmargin(0)
-        axis.set_xlabel('Frequency (GHz)')
-        axis.set_ylabel('S-Parameter (dB)')
-        axis.legend()
+        fig, axis = plt.subplots(3, 1, num='S-Parameters', tight_layout=True, sharex=True)
+
+        # S11
+        axis[0].plot(f/1e9, s11_dB, 'k-', linewidth=2)
+        axis[0].set_ylabel('$S_{11}$ (dB)')
+        axis[0].grid()
+        axis[0].set_xmargin(0)
+
+        # S21
+        axis[1].plot(f/1e9, s21_dB, 'r--', linewidth=2)
+        axis[1].set_ylabel('$S_{21}$ (dB)')
+        axis[1].grid()
+        axis[1].set_xmargin(0)
+
+        # S31
+        axis[2].plot(f/1e9, s31_dB, 'b-.', linewidth=2)
+        axis[2].set_ylabel('$S_{31}$ (dB)')
+        axis[2].set_xlabel('Frequency (GHz)')
+        axis[2].grid()
+        axis[2].set_xmargin(0)
 
         plt.show()
 

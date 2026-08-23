@@ -354,11 +354,11 @@ stop  = [ 26.83*1000, 40.00*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
 start = [ 26.83*1000, 19.49*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 35.3*1000,           0, air_spacing+PCB_THICKNESS]
+stop  = [ 35.2*1000,           0, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
 start = [ 26.83*1000, 20.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 35.3*1000,  40.00*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 35.2*1000,  40.00*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
 start = [ 53.78*1000, 09.49*1000, air_spacing+PCB_THICKNESS]
@@ -385,11 +385,11 @@ start = [ 46.21*1000, 11.88*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 53.78*1000, 28.13*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
-start = [ 44.96*1000, 00.00*1000, air_spacing+PCB_THICKNESS]
+start = [ 44.90*1000, 00.00*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 46.21*1000, 09.49*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
-start = [ 44.96*1000, 30.51*1000, air_spacing+PCB_THICKNESS]
+start = [ 44.90*1000, 30.51*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 46.21*1000, 40.00*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
@@ -401,7 +401,6 @@ points = [
     [45.42*1000, 45.42*1000,  36.20*1000],
     [10.51*1000, 29.49*1000,  20.00*1000],
 ]
-
 gnd.AddPolygon(
     points=points,
     norm_dir='z',
@@ -410,16 +409,27 @@ gnd.AddPolygon(
 )
 
 points = [
-    [35.30*1000, 35.30*1000,  45.21*1000, 45.21*1000],
+    [35.20*1000, 35.20*1000,  44.96*1000, 44.96*1000],
     [00.00*1000, 19.49*1000,  09.49*1000, 0*1000],
 ]
-
 gnd.AddPolygon(
     points=points,
     norm_dir='z',
     elevation=air_spacing+PCB_THICKNESS,
     priority=999
 )
+
+points = [
+    [35.20*1000, 35.20*1000,  44.96*1000, 44.96*1000],
+    [40.00*1000, 20.51*1000,  30.51*1000, 40*1000],
+]
+gnd.AddPolygon(
+    points=points,
+    norm_dir='z',
+    elevation=air_spacing+PCB_THICKNESS,
+    priority=999
+)
+
 
 # Bottom ground
 start = [         0,         0, air_spacing]

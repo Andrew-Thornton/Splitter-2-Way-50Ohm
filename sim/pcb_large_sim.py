@@ -117,6 +117,15 @@ mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + CPW_gap - third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - third_mesh)
 mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - CPW_gap + third_mesh)
+mesh.AddLine('y', 10000 + trace_width/2 + third_mesh)
+mesh.AddLine('y', 10000 + trace_width/2 + CPW_gap - third_mesh)
+mesh.AddLine('y', 10000 - trace_width/2 - third_mesh)
+mesh.AddLine('y', 10000 - trace_width/2 - CPW_gap + third_mesh)
+
+mesh.AddLine('y', 30000 + trace_width/2 + third_mesh)
+mesh.AddLine('y', 30000 + trace_width/2 + CPW_gap - third_mesh)
+mesh.AddLine('y', 30000 - trace_width/2 - third_mesh)
+mesh.AddLine('y', 30000 - trace_width/2 - CPW_gap + third_mesh)
 
 # mesh.AddLine('y', [
 #     res_y - res_pad_height/2,

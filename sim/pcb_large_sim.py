@@ -397,6 +397,18 @@ start = [ 45.42*1000, 10.51*1000, air_spacing+PCB_THICKNESS]
 stop  = [ 46.21*1000, 29.49*1000, air_spacing+PCB_THICKNESS]
 gnd.AddBox(start, stop, priority=999)
 
+points = [
+    [45.42*1000, 45.42*1000,  36.20*1000],
+    [10.51*1000, 29.49*1000,  20.00*1000],
+]
+
+gnd.AddPolygon(
+    points=points,
+    norm_dir='z',
+    elevation=air_spacing+PCB_THICKNESS,
+    priority=999
+)
+
 # Bottom ground
 start = [         0,         0, air_spacing]
 stop  = [PCB_LENGTH, PCB_WIDTH, air_spacing]

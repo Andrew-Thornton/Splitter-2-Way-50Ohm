@@ -1116,6 +1116,7 @@ if run_sim == 1:
 
     s11_dB = 20 * np.log10(np.abs(s11))
     s21_dB = 20 * np.log10(np.abs(s21))
+    s31_dB = 20 * np.log10(np.abs(s31))
 
     ### Pass / fail checks
     mask = f > 100e6

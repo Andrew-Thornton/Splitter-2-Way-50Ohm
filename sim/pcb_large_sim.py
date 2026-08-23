@@ -242,6 +242,21 @@ print(f'trace_start = {start}')
 print(f'trace_stop  = {stop}')
 trace_middle.AddBox(start, stop, priority=999)
 
+points = [
+    [44.97*1000, 45.37*1000, 35.02*1000, 35.49*1000],
+    [30.30*1000, 29.82*1000, 20.36*1000, 19.96*1000],
+]
+
+# function CSX = AddLinPoly( CSX, materialname, prio, normDir, elevation, points, Length, varargin)
+# materialname, prio, normDir, elevation, points,
+trace_middle.AddLinPoly(
+    points=points,
+    normDir='z',
+    elevation=air_spacing,
+    Length=PCB_THICKNESS,
+    priority=999
+)
+
 trace_out2 = CSX.AddMetal('TRACE_OUT2')
 start = [PCB_LENGTH-CPW_port_length, 30000 - trace_width/2, air_spacing+PCB_THICKNESS]
 stop  = [                     53000, 30000 + trace_width/2, air_spacing+PCB_THICKNESS]

@@ -1090,7 +1090,8 @@ if not simdir.exists():
 xmlpath = simdir / xmlname
 
 CSX.Write2XML(str(xmlpath))
-os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
+if not os.environ.get('CI'):
+    os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
 
 run_sim = 1
 
@@ -1134,6 +1135,9 @@ if run_sim == 1:
     # print('PASS')
 
     if 1:  # set to 1 for debugging plots
+        import matplotlib
+        if os.environ.get('CI'):
+            matplotlib.use('Agg')  # headless backend, no display needed
         import matplotlib.pyplot as plt
 
         fig, axis = plt.subplots(3, 1, num='S-Parameters', tight_layout=True, sharex=True)
@@ -1157,5 +1161,9 @@ if run_sim == 1:
         axis[2].grid()
         axis[2].set_xmargin(0)
 
-        plt.show()
+        results_dir = pathlib.Path("./results")
+        results_dir.mkdir(parents=True, exist_ok=True)
+        fig.savefig(results_dir / "s_parameters.png", dpi=200)
 
+        if not os.environ.get('CI'):
+            plt.show()

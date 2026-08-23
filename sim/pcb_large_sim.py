@@ -335,23 +335,45 @@ for i in range(num_resistors):
 
 ### CPW ground planes
 gnd = CSX.AddMetal('GND')
-# start = [          0, 19.49*1000, air_spacing+PCB_THICKNESS]
-# stop  = [ 19.28*1000,          0, air_spacing+PCB_THICKNESS]
-# gnd.AddBox(start, stop, priority=999)
 
-# start = [          0, 20.51*1000, air_spacing+PCB_THICKNESS]
-# stop  = [ 19.28*1000,    40*1000, air_spacing+PCB_THICKNESS]
-# gnd.AddBox(start, stop, priority=999)
+# Top grounds
+start = [          0, 19.49*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 19.28*1000,          0, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
-# start = [ 19.28*1000, 18.12*1000, air_spacing+PCB_THICKNESS]
-# stop  = [ 26.83*1000,          0, air_spacing+PCB_THICKNESS]
-# gnd.AddBox(start, stop, priority=999)
+start = [          0, 20.51*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 19.28*1000,    40*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
-# start = [ 19.28*1000, 21.88*1000, air_spacing+PCB_THICKNESS]
-# stop  = [ 26.83*1000,    40*1000, air_spacing+PCB_THICKNESS]
-# gnd.AddBox(start, stop, priority=999)
+start = [ 19.28*1000, 18.12*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 26.83*1000,          0, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
+start = [ 19.28*1000, 21.88*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 26.83*1000, 40.00*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
 
+start = [ 26.83*1000, 19.49*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 35.3*1000,           0, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 26.83*1000, 20.51*1000, air_spacing+PCB_THICKNESS]
+stop  = [ 35.3*1000,  40.00*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 53.78*1000, 09.49*1000, air_spacing+PCB_THICKNESS]
+stop  = [ PCB_LENGTH,  0.00*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 53.78*1000, 30.51*1000, air_spacing+PCB_THICKNESS]
+stop  = [ PCB_LENGTH,  40.00*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+start = [ 53.78*1000, 10.51*1000, air_spacing+PCB_THICKNESS]
+stop  = [ PCB_LENGTH, 29.49*1000, air_spacing+PCB_THICKNESS]
+gnd.AddBox(start, stop, priority=999)
+
+# Bottom ground
 start = [         0,         0, air_spacing]
 stop  = [PCB_LENGTH, PCB_WIDTH, air_spacing]
 gnd.AddBox(start, stop, priority=999)
@@ -979,12 +1001,12 @@ via_locations = [[1350.0,850.0,21090.0,20590.0,7510,7000],
 [73950.0,73450.0,38690.0,38190.0,7510,7000],
 [73950.0,73450.0,1810.0,1310.0,7510,7000],
 ]
-gnd_vias = CSX.AddMetal('GND_VIAS')
+# gnd_vias = CSX.AddMetal('GND_VIAS')
 for x_start, x_end, y_start, y_end, z_start, z_end in via_locations:
     start = [x_start, y_start, z_start]
     stop  = [x_end, y_end, z_end]
-
-    gnd_vias.AddBox(start, stop, priority=999)
+    gnd.AddBox(start, stop, priority=999)
+    # gnd_vias.AddBox(start, stop, priority=999)
 
 
 

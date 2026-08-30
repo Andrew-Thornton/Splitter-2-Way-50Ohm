@@ -61,3 +61,11 @@ jobs:
           path: sim/results/*.png
           if-no-files-found: warn
 
+      - name: Upload E-field VTR dumps
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sim-field-dumps
+          path: sim/pcb_large_sim/*.vtr
+          if-no-files-found: warn
+

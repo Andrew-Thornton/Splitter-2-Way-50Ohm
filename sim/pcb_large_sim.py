@@ -17,7 +17,7 @@
 
 """
 
-import os, tempfile
+import os
 import pathlib
 import argparse
 import numpy as np
@@ -52,7 +52,7 @@ SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 print(f'Script directory (anchor for outputs): {SCRIPT_DIR}')
 print(f'Current working directory at startup: {pathlib.Path.cwd()}')
 
-Sim_Path = os.path.join(tempfile.gettempdir(), 'pcb_large_sim')
+Sim_Path = str(SCRIPT_DIR / 'pcb_large_sim')
 
 unit                = 1e-6   # drawing unit in um
 
@@ -1090,6 +1090,27 @@ for x_start, x_end, y_start, y_end, z_start, z_end in via_locations:
     gnd.AddBox(start, stop, priority=999)
     # gnd_vias.AddBox(start, stop, priority=999)
 
+
+# ---------------------------------------------------------------------------
+# E-FIELD DUMP FOR PARAVIEW
+# ---------------------------------------------------------------------------
+# Save the time-domain E-field (one .vtr per timestep) as VTK, on a single
+# horizontal plane at mid-substrate-thickness spanning the full PCB
+# footprint.
+#
+# openEMS uses:
+#   dump_type=0  : time-domain E-field
+#   file_type=0  : VTK output
+#   dump_mode=2  : cell-based interpolation
+dumpBoxList = {}
+
+dumpboxName = "efield_efield"
+dumpBoxList[dumpboxName] = CSX.AddDump(
+    dumpboxName, dump_type=0, file_type=0, dump_mode=2, sub_sampling=[2, 2, 2]
+)
+dumpboxStart = [0,          0,         air_spacing + PCB_THICKNESS/2]
+dumpboxStop  = [PCB_LENGTH, PCB_WIDTH, air_spacing + PCB_THICKNESS/2]
+dumpBoxList[dumpboxName].AddBox(dumpboxStart, dumpboxStop)
 
 
 

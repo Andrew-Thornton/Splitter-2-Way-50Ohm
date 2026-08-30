@@ -19,8 +19,14 @@
 
 import os, tempfile
 import pathlib
+import argparse
 import numpy as np
 from math import floor
+
+parser = argparse.ArgumentParser(description='CPW line simulation')
+parser.add_argument('--plot', action='store_true',
+                     help='Open the AppCSXCAD geometry viewer and show the S-parameter plot window')
+args = parser.parse_args()
 
 from CSXCAD  import ContinuousStructure
 from openEMS import openEMS
@@ -1090,7 +1096,7 @@ if not simdir.exists():
 xmlpath = simdir / xmlname
 
 CSX.Write2XML(str(xmlpath))
-if not os.environ.get('CI'):
+if args.plot:
     os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
 
 run_sim = 1
@@ -1136,7 +1142,7 @@ if run_sim == 1:
 
     if 1:  # set to 1 for debugging plots
         import matplotlib
-        if os.environ.get('CI'):
+        if not args.plot:
             matplotlib.use('Agg')  # headless backend, no display needed
         import matplotlib.pyplot as plt
 
@@ -1165,5 +1171,5 @@ if run_sim == 1:
         results_dir.mkdir(parents=True, exist_ok=True)
         fig.savefig(results_dir / "s_parameters.png", dpi=200)
 
-        if not os.environ.get('CI'):
+        if args.plot:
             plt.show()

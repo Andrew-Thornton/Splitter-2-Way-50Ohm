@@ -86,7 +86,7 @@ mesh = CSX.GetGrid()
 mesh.SetDeltaUnit(unit)
 
 print(f'C0 is {C0}')
-resolution = 10 # 10um cell size
+resolution = 20 # 10um cell size
 
 print(f"resolution is {resolution}")
 # x-mesh: uniform 10um resolution
@@ -123,7 +123,7 @@ z_top = 2*air_spacing + PCB_THICKNESS
 z_lines_bottom = np.arange(
     z_bottom,
     z_substrate_start,
-    1000
+    100
 )
 
 # Substrate
@@ -137,7 +137,7 @@ z_lines_substrate = np.arange(
 z_lines_top = np.arange(
     z_substrate_end,
     z_top,
-    1000
+    100
 )
 
 # Make sure important boundaries are included

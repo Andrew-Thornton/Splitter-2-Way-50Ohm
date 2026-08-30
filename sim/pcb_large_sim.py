@@ -86,10 +86,10 @@ mesh = CSX.GetGrid()
 mesh.SetDeltaUnit(unit)
 
 print(f'C0 is {C0}')
-resolution = 20 # 20um cell size
+resolution = 20 # 10um cell size
 
 print(f"resolution is {resolution}")
-# x-mesh: uniform 20um resolution
+# x-mesh: uniform 10um resolution
 mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
 mesh.AddLine('x', [-air_spacing, PCB_LENGTH + air_spacing])
@@ -103,7 +103,6 @@ res_left_x     = [20037.5, 47037.5, 47037.5]
 res_right_x    = [25962.5, 52962.5, 52962.5]
 res_y          = [20000.0, 10000, 30000]
 
-# y-mesh: uniform 20um resolution
 mesh.AddLine('y', [0])
 mesh.AddLine('y', [PCB_WIDTH])
 mesh.SmoothMeshLines('y', resolution)

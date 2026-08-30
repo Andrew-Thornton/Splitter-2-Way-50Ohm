@@ -86,15 +86,14 @@ mesh = CSX.GetGrid()
 mesh.SetDeltaUnit(unit)
 
 print(f'C0 is {C0}')
-# resolution = C0 / (f_max * np.sqrt(substrate_epr)) / unit / 30
 resolution = 20 # 20um cell size
-edge_res   = 40
 
 print(f"resolution is {resolution}")
-# x-mesh: cuts up the length axis into resolution even points
+# x-mesh: uniform 20um resolution
 mesh.AddLine('x', [0])
 mesh.AddLine('x', [PCB_LENGTH])
 mesh.AddLine('x', [-air_spacing, PCB_LENGTH + air_spacing])
+mesh.SmoothMeshLines('x', resolution)
 
 num_resistors = 3
 #2512 resistor pad boundaries
@@ -104,53 +103,10 @@ res_left_x     = [20037.5, 47037.5, 47037.5]
 res_right_x    = [25962.5, 52962.5, 52962.5]
 res_y          = [20000.0, 10000, 30000]
 
-mesh.AddLine('x', [
-    res_left_x[0]  - res_pad_width/2,
-    res_left_x[0]  + res_pad_width/2,
-    res_right_x[0] - res_pad_width/2,
-    res_right_x[0] + res_pad_width/2
-])
-x_resolution = 100
-mesh.SmoothMeshLines('x', x_resolution)
-
-mesh.AddLine('x', [
-    res_left_x[1]  - res_pad_width/2,
-    res_left_x[1]  + res_pad_width/2,
-    res_right_x[1] - res_pad_width/2,
-    res_right_x[1] + res_pad_width/2
-])
-x_resolution = 100
-mesh.SmoothMeshLines('x', x_resolution)
-
-# y-mesh: fine at CPW signal and gap edges, coarse elsewhere
-#car between SMAs or Y=6 to 34
-#care less between 0<Y<6 and 34<Y<40
-third_mesh = np.array([-2/3, 1/3]) * edge_res
+# y-mesh: uniform 20um resolution
 mesh.AddLine('y', [0])
 mesh.AddLine('y', [PCB_WIDTH])
-mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + third_mesh)
-mesh.AddLine('y', PCB_WIDTH/2 + trace_width/2 + CPW_gap - third_mesh)
-mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - third_mesh)
-mesh.AddLine('y', PCB_WIDTH/2 - trace_width/2 - CPW_gap + third_mesh)
-mesh.AddLine('y', 10000 + trace_width/2 + third_mesh)
-mesh.AddLine('y', 10000 + trace_width/2 + CPW_gap - third_mesh)
-mesh.AddLine('y', 10000 - trace_width/2 - third_mesh)
-mesh.AddLine('y', 10000 - trace_width/2 - CPW_gap + third_mesh)
-
-mesh.AddLine('y', 30000 + trace_width/2 + third_mesh)
-mesh.AddLine('y', 30000 + trace_width/2 + CPW_gap - third_mesh)
-mesh.AddLine('y', 30000 - trace_width/2 - third_mesh)
-mesh.AddLine('y', 30000 - trace_width/2 - CPW_gap + third_mesh)
-
-# mesh.AddLine('y', [
-#     res_y - res_pad_height/2,
-#     res_y + res_pad_height/2
-# ])
-
-mesh.SmoothMeshLines('y', edge_res*1.5, ratio=1.5)
-print(f'resolution = {resolution}')
-resolution = C0 / (f_max * np.sqrt(substrate_epr)) / unit / 30
-mesh.SmoothMeshLines('y', resolution, ratio=1.3)
+mesh.SmoothMeshLines('y', resolution)
 
 # z-mesh: fine inside substrate, coarse in air
 # mesh.AddLine('z', [0])

@@ -17,7 +17,7 @@
 
 """
 
-import os, tempfile
+import os
 import pathlib
 import numpy as np
 from math import floor
@@ -32,7 +32,10 @@ epsilon_0 = 8.8541878128e-12
 print(f'epsilon_0 is {epsilon_0}')
 
 ### Setup the simulation
-Sim_Path = os.path.join(tempfile.gettempdir(), 'CPW_Line')
+# Results are written next to this script (in a 'CPW_Line' subfolder) instead
+# of the OS temp directory, so ParaView can find the .vtr field dumps easily.
+Script_Dir = os.path.dirname(os.path.abspath(__file__))
+Sim_Path   = os.path.join(Script_Dir, 'CPW_Line')
 
 unit                = 1e-6   # drawing unit in um
 CPW_length          = 40000
@@ -170,6 +173,30 @@ for wide_via_idx in range(half_num_vias_wide):
 
 
 
+# ---------------------------------------------------------------------------
+# E-FIELD DUMP FOR PARAVIEW
+# ---------------------------------------------------------------------------
+# Save the time-domain E-field (one .vtr per timestep) as VTK, on a single
+# horizontal plane at mid-substrate-thickness spanning the full PCB
+# footprint -- this is the same idea as the mid-plane slice we were doing
+# manually in ParaView, just captured directly by the FDTD dump instead.
+#
+# openEMS uses:
+#   dump_type=0  : time-domain E-field
+#   file_type=0  : VTK output
+#   dump_mode=2  : cell-based interpolation
+dumpBoxList = {}
+
+dumpboxName = "efield_efield"
+dumpBoxList[dumpboxName] = CSX.AddDump(
+    dumpboxName, dump_type=0, file_type=0, dump_mode=2, sub_sampling=[2, 2, 2]
+)
+dumpboxStart = [-CPW_length/2, -substrate_width/2, substrate_thickness/2]
+dumpboxStop  = [ CPW_length/2,  substrate_width/2, substrate_thickness/2]
+dumpBoxList[dumpboxName].AddBox(dumpboxStart, dumpboxStop)
+
+print("E-field time-domain dump configured")
+
 # Write geometry and open AppCSXCAD
 simdir = pathlib.Path("./simulation")
 xmlname = pathlib.Path("simulation.xml")
@@ -183,7 +210,16 @@ CSX.Write2XML(str(xmlpath))
 os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
 
 ### Run the simulation
-FDTD.Run(Sim_Path, cleanup=True)
+FDTD.Run(Sim_Path, cleanup=False)
+
+
+# ---------------------------------------------------------------------------
+# LIST GENERATED FIELD FILES
+# ---------------------------------------------------------------------------
+print("\nGenerated files:")
+for path in sorted(pathlib.Path(Sim_Path).rglob("*")):
+    if path.is_file():
+        print(f"  {path}")
 
 ### Post-processing
 f = np.linspace(1e6, f_max, 1601)

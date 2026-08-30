@@ -258,7 +258,7 @@ currDir = os.getcwd()
 trace_middle_poly = trace_middle.AddPolyhedronReader(os.path.join(currDir, 'middle_trace.stl'), priority=9900)
 trace_middle_poly.ReadFile()
 trace_middle_poly.AddTransform('Scale', [1000, -1000, 1000]) #mm to um, y is inverted in kicad
-trace_middle_poly.AddTransform('Translate', [0, 0, air_spacing + PCB_THICKNESS]) # lifting up
+trace_middle_poly.AddTransform('Translate', [0, 0, air_spacing]) # lifting up
 
 
 trace_out2 = CSX.AddMetal('TRACE_OUT2')
@@ -326,98 +326,10 @@ for i in range(num_resistors):
 gnd = CSX.AddMetal('GND')
 
 # Top grounds
-start = [          0, 19.49*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 19.28*1000,          0, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [          0, 20.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 19.28*1000,    40*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 19.28*1000, 18.12*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 26.83*1000,          0, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 19.28*1000, 21.88*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 26.83*1000, 40.00*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 26.83*1000, 19.49*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 35.2*1000,           0, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 26.83*1000, 20.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 35.2*1000,  40.00*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 53.78*1000, 09.49*1000, air_spacing+PCB_THICKNESS]
-stop  = [ PCB_LENGTH,  0.00*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 53.78*1000, 30.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ PCB_LENGTH,  40.00*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 53.78*1000, 10.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ PCB_LENGTH, 29.49*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 46.21*1000, 31.88*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 53.78*1000, 40.00*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 46.21*1000, 00.00*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 53.78*1000, 08.12*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 46.21*1000, 11.88*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 53.78*1000, 28.13*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 44.90*1000, 00.00*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 46.21*1000, 09.49*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 44.90*1000, 30.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 46.21*1000, 40.00*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-start = [ 45.42*1000, 10.51*1000, air_spacing+PCB_THICKNESS]
-stop  = [ 46.21*1000, 29.49*1000, air_spacing+PCB_THICKNESS]
-gnd.AddBox(start, stop, priority=999)
-
-points = [
-    [45.42*1000, 45.42*1000,  36.20*1000],
-    [10.51*1000, 29.49*1000,  20.00*1000],
-]
-gnd.AddPolygon(
-    points=points,
-    norm_dir='z',
-    elevation=air_spacing+PCB_THICKNESS,
-    priority=999
-)
-
-points = [
-    [35.20*1000, 35.20*1000,  44.96*1000, 44.96*1000],
-    [00.00*1000, 19.49*1000,  09.49*1000, 0*1000],
-]
-gnd.AddPolygon(
-    points=points,
-    norm_dir='z',
-    elevation=air_spacing+PCB_THICKNESS,
-    priority=999
-)
-
-points = [
-    [35.20*1000, 35.20*1000,  44.96*1000, 44.96*1000],
-    [40.00*1000, 20.51*1000,  30.51*1000, 40*1000],
-]
-gnd.AddPolygon(
-    points=points,
-    norm_dir='z',
-    elevation=air_spacing+PCB_THICKNESS,
-    priority=999
-)
+top_gnd_poly = gnd.AddPolyhedronReader(os.path.join(currDir, 'top_gnd.stl'), priority=999)
+top_gnd_poly.ReadFile()
+top_gnd_poly.AddTransform('Scale', [1000, -1000, 1000])
+top_gnd_poly.AddTransform('Translate', [0, 0, air_spacing])
 
 
 # Bottom ground

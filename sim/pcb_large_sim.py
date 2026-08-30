@@ -43,6 +43,15 @@ os.environ["VTK_SILENCE_DEPRECATION_WARNINGS"] = "1"
 from CSXCAD import ContinuousStructure
 
 ### Setup the simulation
+# Anchor output paths to this script's own location rather than the
+# current working directory. openEMS's FDTD.Run() changes the process's
+# cwd internally and does not restore it, so any later "./relative" paths
+# silently end up somewhere unexpected (e.g. under /tmp) instead of next
+# to this script -- which is why plots could go missing in CI.
+SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
+print(f'Script directory (anchor for outputs): {SCRIPT_DIR}')
+print(f'Current working directory at startup: {pathlib.Path.cwd()}')
+
 Sim_Path = os.path.join(tempfile.gettempdir(), 'pcb_large_sim')
 
 unit                = 1e-6   # drawing unit in um
@@ -1087,7 +1096,7 @@ for x_start, x_end, y_start, y_end, z_start, z_end in via_locations:
 
 
 # Write geometry and open AppCSXCAD
-simdir = pathlib.Path("./simulation")
+simdir = SCRIPT_DIR / "simulation"
 xmlname = pathlib.Path("simulation.xml")
 
 if not simdir.exists():
@@ -1095,6 +1104,7 @@ if not simdir.exists():
 
 xmlpath = simdir / xmlname
 
+print(f'Writing CSXCAD geometry to: {xmlpath.resolve()}')
 CSX.Write2XML(str(xmlpath))
 if args.plot:
     os.system(f'~/opt/openEMS/bin/AppCSXCAD "{xmlpath}"')
@@ -1103,7 +1113,12 @@ run_sim = 1
 
 if run_sim == 1:
     ### Run the simulation
+    print(f'Current working directory before FDTD.Run: {pathlib.Path.cwd()}')
     FDTD.Run(Sim_Path, cleanup=True)
+    # Note: FDTD.Run() is known to os.chdir() into Sim_Path internally and
+    # not restore the original cwd afterward. Printing it here makes that
+    # visible instead of silently breaking any "./relative" paths below.
+    print(f'Current working directory after FDTD.Run: {pathlib.Path.cwd()}')
 
     ### Post-processing
     f = np.linspace(1e6, f_max, 1601)
@@ -1167,9 +1182,13 @@ if run_sim == 1:
         axis[2].grid()
         axis[2].set_xmargin(0)
 
-        results_dir = pathlib.Path("./results")
+        results_dir = SCRIPT_DIR / "results"
         results_dir.mkdir(parents=True, exist_ok=True)
-        fig.savefig(results_dir / "s_parameters.png", dpi=200)
+        plot_path = results_dir / "s_parameters.png"
+        print(f'Current working directory before saving plot: {pathlib.Path.cwd()}')
+        print(f'Saving S-parameter plot to: {plot_path.resolve()}')
+        fig.savefig(plot_path, dpi=200)
+        print(f'Plot saved: {plot_path.resolve()}  (exists: {plot_path.exists()})')
 
         if args.plot:
             plt.show()

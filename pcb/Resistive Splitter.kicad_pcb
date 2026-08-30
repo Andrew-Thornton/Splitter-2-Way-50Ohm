@@ -3368,6 +3368,25 @@
 		(uuid "224ff356-9dbb-4449-89a1-8b7e6c30eeea")
 	)
 	(via
+		(at 39.07 20.17)
+		(size 0.5)
+		(drill 0.41)
+		(layers "F.Cu" "B.Cu")
+		(free yes)
+		(capping no)
+		(covering
+			(front no)
+			(back no)
+		)
+		(plugging
+			(front no)
+			(back no)
+		)
+		(filling no)
+		(net "GND")
+		(uuid "2287bbd5-ea53-4658-8026-65fe3a51f3d4")
+	)
+	(via
 		(at 39.55 16.87)
 		(size 0.5)
 		(drill 0.41)

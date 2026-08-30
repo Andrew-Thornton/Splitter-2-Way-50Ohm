@@ -5,3 +5,5 @@
 !./*.kicad_pcb
 !./*.kicad_pro
 !./*.kicad_sch
+!./*.drl
+

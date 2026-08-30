@@ -254,47 +254,11 @@ trace_in.AddBox(start, stop, priority=999)
 
 ### CPW centre conductor between the two ports
 trace_middle = CSX.AddMetal('TRACE_MIDDLE')
-start = [26.6*1000, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
-stop  = [35.6*1000, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
-print(f'trace_start = {start}')
-print(f'trace_stop  = {stop}')
-trace_middle.AddBox(start, stop, priority=999)
-
-start = [45.08*1000,  9.69*1000, air_spacing+PCB_THICKNESS]
-stop  = [47.20*1000, 10.31*1000, air_spacing+PCB_THICKNESS]
-print(f'trace_start = {start}')
-print(f'trace_stop  = {stop}')
-trace_middle.AddBox(start, stop, priority=999)
-
-start = [45.08*1000, 29.69*1000, air_spacing+PCB_THICKNESS]
-stop  = [47.20*1000, 30.31*1000, air_spacing+PCB_THICKNESS]
-print(f'trace_start = {start}')
-print(f'trace_stop  = {stop}')
-trace_middle.AddBox(start, stop, priority=999)
-
-points = [
-    [35.60*1000, 35.16*1000,  45.08*1000, 45.51*1000],
-    [19.69*1000, 20.12*1000,  30.31*1000, 29.88*1000],
-]
-
-trace_middle.AddPolygon(
-    points=points,
-    norm_dir='z',
-    elevation=air_spacing+PCB_THICKNESS,
-    priority=999
-)
-
-points = [
-    [35.60*1000, 35.16*1000,  45.08*1000, 45.51*1000],
-    [20.31*1000, 19.88*1000,  09.69*1000, 10.12*1000],
-]
-
-trace_middle.AddPolygon(
-    points=points,
-    norm_dir='z',
-    elevation=air_spacing+PCB_THICKNESS,
-    priority=999
-)
+currDir = os.getcwd()
+trace_middle_poly = trace_middle.AddPolyhedronReader(os.path.join(currDir, 'middle_trace.stl'), priority=9900)
+trace_middle_poly.ReadFile()
+trace_middle_poly.AddTransform('Scale', [1000, -1000, 1000]) #mm to um, y is inverted in kicad
+trace_middle_poly.AddTransform('Translate', [0, 0, air_spacing + PCB_THICKNESS]) # lifting up
 
 
 trace_out2 = CSX.AddMetal('TRACE_OUT2')

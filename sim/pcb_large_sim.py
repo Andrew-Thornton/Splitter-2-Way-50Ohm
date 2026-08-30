@@ -461,27 +461,26 @@ start = [         0,         0, air_spacing]
 stop  = [PCB_LENGTH, PCB_WIDTH, air_spacing]
 gnd.AddBox(start, stop, priority=999)
 
-### GND stitching vias — imported from the KiCad drill file
+### Via / drill-hole geometry — imported from the KiCad drill file
 #
-# The block below used to hard-code an approximate grid of via boxes.
-# It's now replaced with real via locations parsed straight from the
-# board's plated-through-hole drill file, so the sim geometry tracks
-# whatever KiCad actually placed (add/move a via in KiCad -> re-export
-# the .drl -> re-run this script, no manual list editing).
+# Parses every tool in the drill file (not just the GND stitching vias),
+# so the connectors' component holes (T2/T3) come in with their own real
+# diameters too, instead of a single hard-coded size.
 
-DRILL_FILE = (SCRIPT_DIR / '../pcb/Resistive Splitter-PTH.drl').resolve()
+DRILL_FILE = (SCRIPT_DIR / '../pcb/Resistive Splitter-PTH.drl').resolve() 
 
-def parse_drill_vias(drl_path, tool_function_filter='ViaDrill'):
+
+def parse_drill_file(drl_path):
     """
-    Parse a KiCad/Excellon drill file (metric, decimal, absolute format --
-    the KiCad default) and return a list of (x_mm, y_mm, diameter_mm)
-    tuples for holes whose Gerber X2 aperture function matches
-    `tool_function_filter`.
+    Parse a full KiCad/Excellon drill file (metric, decimal, absolute
+    format -- the KiCad default) and return every tool's diameter,
+    aperture function, and hole coordinates.
 
-    'ViaDrill' selects only plated stitching vias (this board's T1,
-    0.41 mm), skipping 'ComponentDrill' holes (T2/T3 -- e.g. connector
-    mounting/pin holes) that aren't part of the GND via stitching.
-    Pass tool_function_filter=None to keep every hole in the file.
+    Returns: dict tool_num -> {
+        'diameter': float (mm),
+        'function': str or None   (e.g. 'ViaDrill', 'ComponentDrill'),
+        'holes':    [(x_mm, y_mm), ...],
+    }
     """
     with open(drl_path) as f:
         drl_lines = f.read().splitlines()
@@ -499,13 +498,13 @@ def parse_drill_vias(drl_path, tool_function_filter='ViaDrill'):
             tools[int(m.group(1))] = {
                 'diameter': float(m.group(2)),
                 'function': current_function,
+                'holes': [],
             }
             continue
         if line == '%':
             break  # end of header / tool table
 
     # --- Coordinate blocks: a bare "Tn" line selects the active tool ---
-    holes = []
     active_tool = None
     coord_re = re.compile(r'^X([-\d.]+)Y([-\d.]+)$')
     for line in drl_lines:
@@ -515,34 +514,32 @@ def parse_drill_vias(drl_path, tool_function_filter='ViaDrill'):
             active_tool = int(tm.group(1))
             continue
         cm = coord_re.match(line)
-        if cm and active_tool is not None:
-            info = tools.get(active_tool, {})
-            if tool_function_filter is None or info.get('function') == tool_function_filter:
-                holes.append((float(cm.group(1)), float(cm.group(2)), info.get('diameter')))
-    return holes
+        if cm and active_tool is not None and active_tool in tools:
+            tools[active_tool]['holes'].append((float(cm.group(1)), float(cm.group(2))))
+    return tools
 
 
-def drill_holes_to_boxes(holes_mm, z_bottom, z_top, pad_margin_um=0.0):
+def holes_to_boxes(holes_mm, diameter_mm, z_bottom, z_top, pad_margin_um=0.0):
     """
-    Convert (x_mm, y_mm, diameter_mm) drill hits into
-    [x_start, x_end, y_start, y_end, z_start, z_end] boxes in the sim's
-    `unit`-scaled coordinates (um here). Each via is approximated as a
-    solid square post the size of the finished drill diameter (plus an
-    optional pad_margin_um to approximate the annular ring/pad instead
-    of just the bare hole) -- same square-box approximation the
-    hand-built list used, just sized from the real drill diameter.
+    Convert a list of (x_mm, y_mm) drill hits -- all sharing one drill
+    diameter -- into [x_start, x_end, y_start, y_end, z_start, z_end]
+    boxes in the sim's um-scaled coordinates. Each hole becomes a solid
+    square post the size of the finished drill diameter (plus an
+    optional pad_margin_um, to approximate the pad/annular ring instead
+    of just the bare drilled hole).
 
     Coordinate mapping from Excellon -> sim frame (matches this board):
       x_sim =  x_drill_mm * 1000   (drill X already runs 0..PCB_LENGTH)
       y_sim = -y_drill_mm * 1000   (drill Y is negative-down in the file;
                                      sim Y runs 0..PCB_WIDTH, positive-up)
-    Coincident duplicate holes (a real board can have these, e.g. two
-    overlapping via footprints) are collapsed to a single box.
+    Coincident duplicate holes (can happen on a real board) are
+    collapsed to a single box.
     """
+    r_um = diameter_mm * 1000.0 / 2.0 + pad_margin_um
     boxes = []
     seen = set()
     n_dupes = 0
-    for x_mm, y_mm, diameter_mm in holes_mm:
+    for x_mm, y_mm in holes_mm:
         x_um = x_mm * 1000.0
         y_um = -y_mm * 1000.0
         key = (round(x_um, 3), round(y_um, 3))
@@ -550,25 +547,47 @@ def drill_holes_to_boxes(holes_mm, z_bottom, z_top, pad_margin_um=0.0):
             n_dupes += 1
             continue
         seen.add(key)
-        r_um = diameter_mm * 1000.0 / 2.0 + pad_margin_um
         boxes.append([x_um + r_um, x_um - r_um, y_um + r_um, y_um - r_um, z_top, z_bottom])
     if n_dupes:
-        print(f'Skipped {n_dupes} duplicate/coincident via drill hit(s)')
+        print(f'    skipped {n_dupes} duplicate/coincident hole(s)')
     return boxes
 
 
-print(f'Reading via locations from: {DRILL_FILE}')
-via_holes = parse_drill_vias(DRILL_FILE, tool_function_filter='ViaDrill')
-print(f'Found {len(via_holes)} plated stitching-via drill hits (T1, ViaDrill)')
+print(f'Reading drill data from: {DRILL_FILE}')
+drill_tools = parse_drill_file(DRILL_FILE)
+for tnum, info in sorted(drill_tools.items()):
+    print(f"  T{tnum}: {info['function'] or '?':<15s} dia={info['diameter']:.3f} mm  "
+          f"x {len(info['holes'])} holes")
 
-via_locations = drill_holes_to_boxes(
-    via_holes,
-    z_bottom=air_spacing,
-    z_top=air_spacing + PCB_THICKNESS,
+# T1 -- plated stitching vias (ViaDrill) -> GND
+VIA_TOOL = next(t for t, info in drill_tools.items() if info['function'] == 'ViaDrill')
+via_locations = holes_to_boxes(
+    drill_tools[VIA_TOOL]['holes'], drill_tools[VIA_TOOL]['diameter'],
+    z_bottom=air_spacing, z_top=air_spacing + PCB_THICKNESS,
 )
-print(f'{len(via_locations)} via boxes after de-duplication')
+print(f'{len(via_locations)} via boxes after de-duplication '
+      f'(T{VIA_TOOL}, {drill_tools[VIA_TOOL]["diameter"]} mm)')
 
-gnd_vias = CSX.AddMetal('GND_VIAS')
+# T2/T3 -- SMA connector holes (ComponentDrill), each kept at its own real
+# diameter. These sit right on top of the CPW ports (0/PCB_LENGTH, y=10/20/30 mm),
+# consistent with a connector's grounded pins/legs, so by default they're
+# folded into the same GND metal as the stitching vias below. If any of
+# these tools are actually non-plated mechanical/mounting holes on your
+# board rather than grounded pins, route that tool's boxes to their own
+# CSX.AddMetal(...) (or drop them) instead of appending to via_locations.
+COMPONENT_TOOLS = sorted(t for t, info in drill_tools.items() if info['function'] == 'ComponentDrill')
+connector_locations = []
+for t in COMPONENT_TOOLS:
+    info = drill_tools[t]
+    boxes = holes_to_boxes(info['holes'], info['diameter'],
+                            z_bottom=air_spacing, z_top=air_spacing + PCB_THICKNESS)
+    print(f'{len(boxes)} connector-pin boxes from T{t} ({info["diameter"]} mm)')
+    connector_locations += boxes
+
+via_locations += connector_locations
+print(f'{len(via_locations)} total boxes (vias + connector pins) going into GND')
+
+gnd_vias = CSX.AddMetal('GND_VIAS') 
 for x_start, x_end, y_start, y_end, z_start, z_end in via_locations:
     start = [x_start, y_start, z_start]
     stop  = [x_end, y_end, z_end]

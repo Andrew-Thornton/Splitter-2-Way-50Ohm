@@ -1,9 +1,10 @@
+
 # Splitter-2-Way-50Ohm
 
 This GitHub repository provides a design for a **50-ohm RF splitter**.  
 It currently uses **KiCad 10.0** and is being tested on **Ubuntu 24.04**.
 
-
+![PCB](./pictures/pcb_2.png)
 ---
 
 
@@ -59,4 +60,14 @@ Note the second time you can just run
 ```bash
 source .venv/bin/activate
 ```
+
+**Running the simulation**
+```bash
+cd sim
+python ./pcb_large_sim.py --plot
+```
+
+Note this is still a work in progress
+
+![PCB](./pictures/paraview.png)
 

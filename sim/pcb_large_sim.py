@@ -463,12 +463,13 @@ for t in COMPONENT_TOOLS:
 via_locations += connector_locations
 print(f'{len(via_locations)} total boxes (vias + connector pins) going into GND')
 
-gnd_vias = CSX.AddMetal('GND_VIAS') 
+# gnd_vias = CSX.AddMetal('GND_VIAS') 
 for x_start, x_end, y_start, y_end, z_start, z_end in via_locations:
+    print(f'z_start = {z_start}, z_end = {z_end}')
     start = [x_start, y_start, z_start]
     stop  = [x_end, y_end, z_end]
-    # gnd.AddBox(start, stop, priority=999)
-    gnd_vias.AddBox(start, stop, priority=999)
+    gnd.AddBox(start, stop, priority=999)
+    # gnd_vias.AddBox(start, stop, priority=999)
 
 
 # ---------------------------------------------------------------------------

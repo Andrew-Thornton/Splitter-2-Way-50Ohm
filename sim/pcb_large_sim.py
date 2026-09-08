@@ -261,7 +261,6 @@ trace_middle_poly.ReadFile()
 trace_middle_poly.AddTransform('Scale', [1000, -1000, 1000]) #mm to um, y is inverted in kicad
 trace_middle_poly.AddTransform('Translate', [0, 0, air_spacing]) # lifting up
 
-
 trace_out2 = CSX.AddMetal('TRACE_OUT2')
 start = [PCB_LENGTH-PORT_SHIFT-CPW_port_length, 30000 - trace_width/2, air_spacing+PCB_THICKNESS]
 stop  = [                     53000, 30000 + trace_width/2, air_spacing+PCB_THICKNESS]
@@ -330,7 +329,7 @@ gnd = CSX.AddMetal('GND')
 top_gnd_poly = gnd.AddPolyhedronReader(os.path.join(currDir, 'top_gnd.stl'), priority=999)
 top_gnd_poly.ReadFile()
 top_gnd_poly.AddTransform('Scale', [1000, -1000, 1000])
-top_gnd_poly.AddTransform('Translate', [0, 0, air_spacing + PCB_THICKNESS])
+top_gnd_poly.AddTransform('Translate', [0, 0, air_spacing])
 
 
 # Bottom ground

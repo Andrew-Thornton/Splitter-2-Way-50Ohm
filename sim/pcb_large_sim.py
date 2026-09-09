@@ -220,8 +220,8 @@ substrate.AddBox(start, stop)
 cpw_port_metal = CSX.AddMetal('CPW_PORT')
 CPW_port_length = 2000 # 2mm
 PORT_SHIFT = 500 # um
-portstart = [               0 + PORT_SHIFT, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
-portstop  = [CPW_port_length + PORT_SHIFT,  PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+portstart = [               0 + PORT_SHIFT, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS + 35]
+portstop  = [CPW_port_length + PORT_SHIFT,  PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS + 35]
 print(f'port1_start = {portstart}')
 print(f'port1_stop  = {portstop}')
 port1 = CPWPort(CSX, 1, cpw_port_metal, portstart, portstop, 'x', 'z', CPW_gap,
@@ -246,16 +246,20 @@ ports = [port1, port2, port3]
 
 ### CPW centre conductor between the two ports
 trace_in = CSX.AddMetal('TRACE_IN')
-start = [             CPW_port_length + PORT_SHIFT, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
-stop  = [19.5*1000, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
-print(f'trace_start = {start}')
-print(f'trace_stop  = {stop}')
-trace_in.AddBox(start, stop, priority=999)
+# start = [             CPW_port_length + PORT_SHIFT, PCB_WIDTH/2 + trace_width/2, air_spacing+PCB_THICKNESS]
+# stop  = [19.5*1000, PCB_WIDTH/2 - trace_width/2, air_spacing+PCB_THICKNESS]
+# print(f'trace_start = {start}')
+# print(f'trace_stop  = {stop}')
+# trace_in.AddBox(start, stop, priority=999)
 
+currDir = os.getcwd()
+trace_in_poly = trace_in.AddPolyhedronReader(os.path.join(currDir, 'trace_in.stl'), priority=9900)
+trace_in_poly.ReadFile()
+trace_in_poly.AddTransform('Scale', [1000, -1000, 1000]) #mm to um, y is inverted in kicad
+trace_in_poly.AddTransform('Translate', [0, 0, air_spacing]) # lifting up
 
 ### CPW centre conductor between the two ports
 trace_middle = CSX.AddMetal('TRACE_MIDDLE')
-currDir = os.getcwd()
 trace_middle_poly = trace_middle.AddPolyhedronReader(os.path.join(currDir, 'middle_trace.stl'), priority=9900)
 trace_middle_poly.ReadFile()
 trace_middle_poly.AddTransform('Scale', [1000, -1000, 1000]) #mm to um, y is inverted in kicad

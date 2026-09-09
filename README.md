@@ -52,7 +52,7 @@ sudo apt-get install build-essential \
 **Set Up Python Virtual Environment for OpenEMS**
 Run the setup script and activate the virtual environment:
 ```bash
-./setup_venv.sh.sh
+./setup_venv.sh
 ```
  
 Note the second time you can just run
